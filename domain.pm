@@ -27,9 +27,9 @@ sub interval($) {
 
 sub txt($) {
     my ($t) = @_;
-    return "\"$t\"" if length $t < 256;
+    return "\"$t\"" if length $t < 255;
     my @part;
-    push @part, $1 while ($t =~ s/^(.{256})//);
+    push @part, $1 while ($t =~ s/^(.{255})//);
     '('.join("\n" . " " x 41, map { "\"$_\"" } @part, $t).')';
 }
 
