@@ -35,10 +35,12 @@ sub txt($) {
 
 our @zone;
 our $conf_prefix='';
+our $default_ttl='1h';
 sub _domain($$) {
     my ($domain, $entries) = @_;
 
-    my $conf = join '', map { my $node = $_;
+    my $conf = '$TTL  '.interval($default_ttl)."\n".
+               join '', map { my $node = $_;
                               map {
                                   my $rr = lc $_;
                                   my $val = $entries->{$node}->{$_};
