@@ -97,4 +97,18 @@ sub soa(%) {
     return (soa => [ $param{primary_ns}, $param{rp_email}, $param{serial} // 0, $param{refresh}, $param{retry}, $param{expire}, $param{min_ttl} ]);
 }
 
+sub list() {
+    no warnings;
+    *domain = *main::domain = \&domain_list;
+    *master = *main::master = \&master_list;
+}
+
+sub domain_list($@) {
+    print "$conf_prefix$_[0].zone\n";
+}
+
+sub master_list($$) {
+    print "$conf_prefix.$_[0]\n"
+}
+
 1;
