@@ -78,10 +78,11 @@ sub domain($@) {
     _domain($domain, $entries);
 }
 
-sub master($$) {
-    my ($filename, $prefix) = @_;
+sub master {
+    my ($filename, $prefix, @extra) = @_;
     $prefix //= '';
     write_file($conf_prefix.$filename,
+               @extra,
                map { <<EOZ
 zone "$_->{domain}" {
     type master;
