@@ -108,7 +108,7 @@ sub domain_list($@) {
 }
 
 sub master_list($$) {
-    print "$conf_prefix.$_[0]\n"
+    print "$conf_prefix$_[0]\n"
 }
 
 1;
