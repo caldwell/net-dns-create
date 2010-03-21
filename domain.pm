@@ -91,6 +91,7 @@ zone "$_->{domain}" {
 
 EOZ
                } @zone);
+    system("named-checkconf", "-z", $conf_prefix.$filename);
 }
 
 sub soa(%) {
