@@ -54,6 +54,10 @@ sub _domain($$) {
                                                        "$prefix $_\n"
                                                     } @$val :
 
+                                  $rr eq 'txt' && ref $val eq 'ARRAY' ? map {
+                                                       "$prefix ".txt($_)."\n"
+                                                    } @$val :
+
                                   sprintf("%s %s\n", $prefix,
                                           $rr eq 'txt' ? txt($val) :
                                           $rr eq 'rp' ? email($val->[0]).' '.$val->[1] :
