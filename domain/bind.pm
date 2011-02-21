@@ -61,7 +61,10 @@ sub _domain($$) {
                                   sprintf("%s %s\n", $prefix,
                                           $rr eq 'txt' ? txt($val) :
                                           $rr eq 'rp' ? email($val->[0]).' '.$val->[1] :
-                                          $rr eq 'soa' ? join(' ', full_host $val->[0], email $val->[1], '(', strftime('%g%m%d%H%M', localtime), map { interval $_ } @{$val}[3..$#{$val}], ')') :
+                                          $rr eq 'soa' ? join(' ', full_host $val->{primary_ns},
+                                                                   email $val->{rp_email}, '(', strftime('%g%m%d%H%M', localtime),
+                                                                                                (map { interval $_ } $val->{refresh}, $val->{retry}, $val->{expire}, $val->{min_ttl}),
+                                                                                           ')') :
                                           $val);
 
                               } keys %{$entries->{$node}}
@@ -100,7 +103,7 @@ EOZ
 
 sub soa(%) {
     my %param = @_;
-    return (soa => [ $param{primary_ns}, $param{rp_email}, $param{serial} // 0, $param{refresh}, $param{retry}, $param{expire}, $param{min_ttl} ]);
+    return (soa => \%param);
 }
 
 sub list() {
