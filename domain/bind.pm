@@ -1,6 +1,6 @@
 #  Copyright (c) 2009 David Caldwell,  All Rights Reserved. -*- cperl -*-
 
-package domain;
+package domain::bind;
 
 use feature ':5.10';
 use strict;
