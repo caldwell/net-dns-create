@@ -5,7 +5,7 @@ use strict; use warnings;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(domain master soa);
-our @EXPORT_OK = qw(domain master soa full_host email interval);
+our @EXPORT_OK = qw(domain master full_host email interval);
 
 my $kind;
 sub import {
@@ -51,11 +51,6 @@ sub domain($@) {
 
 sub master {
     $kind->master(@_);
-}
-
-sub soa(%) {
-    my %param = @_;
-    return (soa => \%param);
 }
 
 sub list() {
