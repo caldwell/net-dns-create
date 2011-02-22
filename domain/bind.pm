@@ -1,28 +1,19 @@
 #  Copyright (c) 2009 David Caldwell,  All Rights Reserved. -*- cperl -*-
 
 package domain::bind;
-
+use domain qw(internal full_host email interval);
 use feature ':5.10';
 use strict;
 use warnings;
 
-require Exporter;
-our @ISA = qw(Exporter);
-our @EXPORT = qw(domain master soa);
-
 use POSIX qw(strftime);
 use File::Slurp qw(write_file);
 
-sub full_host($) { $_[0] =~ /\.$/ ? $_[0] : "$_[0]." }
-
-sub email($) {
-    my ($email) = @_;
-    $email =~ s/@/./g;
-    full_host($email);
-}
-
-sub interval($) {
-    $_[0] =~ /(\d+)([hmsdw])/ && $1 * { s=>1, m=>60, h=>3600, d=>3600*24, w=>3600*24*7 }->{$2} || $_[0];
+our %config = (conf_prefix=>'', default_ttl=>'1h');
+sub import {
+    my $package = shift;
+    my %c = @_;
+    $config{$_} = $c{$_} for keys %c;
 }
 
 sub txt($) {
@@ -34,12 +25,10 @@ sub txt($) {
 }
 
 our @zone;
-our $conf_prefix='';
-our $default_ttl='1h';
-sub _domain($$) {
-    my ($domain, $entries) = @_;
+sub domain {
+    my ($package, $domain, $entries) = @_;
 
-    my $conf = '$TTL  '.interval($default_ttl)."\n".
+    my $conf = '$TTL  '.interval($config{default_ttl})."\n".
                join '', map { my $node = $_;
                               map {
                                   my $rr = lc $_;
@@ -70,7 +59,7 @@ sub _domain($$) {
                                   sprintf("%s %s\n", $prefix,
                                           $rr eq 'txt' ? txt($val) :
                                           $rr eq 'rp' ? email($val->[0]).' '.$val->[1] :
-                                          $rr eq 'soa' ? join(' ', full_host $val->{primary_ns},
+                                          $rr eq 'soa' ? join(' ', full_host($val->{primary_ns}),
                                                                    email $val->{rp_email}, '(', strftime('%g%m%d%H%M', localtime),
                                                                                                 (map { interval $_ } $val->{refresh}, $val->{retry}, $val->{expire}, $val->{min_ttl}),
                                                                                            ')') :
@@ -79,25 +68,15 @@ sub _domain($$) {
                               } keys %{$entries->{$node}}
     } keys %$entries;
 
-    my $conf_name = "$conf_prefix$domain.zone";
+    my $conf_name = "$config{conf_prefix}$domain.zone";
     push @zone, { conf => $conf_name, domain => $domain };
     write_file($conf_name, $conf);
 }
 
-use Hash::Merge::Simple qw(merge);
-sub domain($@) {
-    my ($domain, @entry_hashes) = @_;
-    my $entries = {};
-    for my $e (@entry_hashes) {
-        $entries = merge($entries, $e);
-    }
-    _domain($domain, $entries);
-}
-
 sub master {
-    my ($filename, $prefix, @extra) = @_;
+    my ($package, $filename, $prefix, @extra) = @_;
     $prefix //= '';
-    write_file($conf_prefix.$filename,
+    write_file($config{conf_prefix}.$filename,
                @extra,
                map { <<EOZ
 zone "$_->{domain}" {
@@ -107,26 +86,15 @@ zone "$_->{domain}" {
 
 EOZ
                } @zone);
-    system("named-checkconf", "-z", $conf_prefix.$filename);
-}
-
-sub soa(%) {
-    my %param = @_;
-    return (soa => \%param);
-}
-
-sub list() {
-    no warnings;
-    *domain = *main::domain = \&domain_list;
-    *master = *main::master = \&master_list;
+    system("named-checkconf", "-z", $config{conf_prefix}.$filename);
 }
 
 sub domain_list($@) {
-    print "$conf_prefix$_[0].zone\n";
+    print "$config{conf_prefix}$_[0].zone\n";
 }
 
 sub master_list($$) {
-    print "$conf_prefix$_[0]\n"
+    print "$config{conf_prefix}$_[0]\n"
 }
 
 1;
