@@ -53,10 +53,16 @@ sub master {
     $kind->master(@_);
 }
 
-sub list() {
+sub list_files() {
     no warnings;
     *domain = *main::domain = \&{"$kind\::domain_list"};
     *master = *main::master = \&{"$kind\::master_list"};
+}
+
+sub list_domains() {
+    no warnings;
+    *domain = *main::domain = sub { print "$_[0]\n" };
+    *master = *main::master = sub {};
 }
 
 
