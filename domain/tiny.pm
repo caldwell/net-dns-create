@@ -46,7 +46,7 @@ sub domain($$) {
                                                   "\@$fqdn:\:$val->{$_}.$fqdn:$_:\:$ttl"
                                               } keys %$val :
                          $rr eq 'ns'    ? map {
-                                                  "&$fqdn:\:$_:\:$ttl"
+                                                  "&$fqdn:\:$_:$ttl"
                                               } @$val :
                          $rr eq 'txt'   ? ref $val eq 'ARRAY' ? map {
                                                                         "'$fqdn:".tiny_escape($_).":$ttl"
