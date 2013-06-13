@@ -1,0 +1,51 @@
+#!/usr/bin/perl
+
+# Choose 1:
+use Net::DNS::Create qw(Bind), default_ttl => "1h", conf_prefix => "local_";
+use Net::DNS::Create qw(Tiny), default_ttl => "1h", conf_prefix => "local_";
+use Net::DNS::Create qw(Route53), default_ttl => "1h", amazon_id => "AKIxxxxxxx", amazon_key => "kjdhakjsfnothisisntrealals";
+
+
+my $localhost = '127.0.0.1';
+
+domain 'example.com', {
+    '@'                      => {     soa   => { primary_ns => 'ns1.example.com.',
+                                                 rp_email   => 'some-email@example.com',
+                                                 serial     => 0,
+                                                 refresh    => '8h',
+                                                 retry      => '2h',
+                                                 expire     => '4w',
+                                                 min_ttl    => '1h' },
+                                      ns    => [ 'ns1.example.com.', 'ns2.example.com.' ],
+                                      a     => $localhost,
+                                      mx    => { 0  => 'mail',
+                                                 10 => 'smtp' },
+                                      TXT   => "v=spf1 mx -all", },
+    'www'                    => { a     => $localhost,
+                                  RP    => ['david@example.com', 'david.people'] },
+    'david.people'           => { TXT   => 'For a good time call: 555-1212' },
+    'smtp'                   => { a     => $localhost },
+    'mail'                   => { a     => $localhost },
+    'example._domainkey'     => { TXT   => "v=DKIM1; n=blah =20 Blah; g=*; k=rsa; p=THISISNOTAREALDOMAINKEYJUSTANEXAMPLENOREALLYBLAHBLAHBLAHDOMAINKEYDOMAINKEYDOMAINKE".
+				           "YTHISISNOTAREALDOMAINKEYJUSTANEXAMPLENOREALLYBLAHBLAHBLAHDOMAINKEYDOMAINKEYDOMAINKETHISISNOTAREALDOMAINKEYJUSTANEXAMPLENOR".
+					   "EALLYBLAHBLAHBLAHDOMAINKEYDOMAINKEYDOMAINKETHISISNOTAREALDOMAINKEYJUSTANEXAMPLENOREALLYBLAHBLAHBLAHDOMAINKEYDOMAINKEYDOMAI".
+					   "NKEYTHISISNOTAREALDOMAINKEY" },
+    '_adsp._domainkey'       => { TXT   => "dkim=all" },
+    stuff                    => { a => $localhost },
+    'more.stuff'             => { a => $localhost },
+    'even.more.stuff'        => { a => $localhost },
+    'tons.of.stuff'          => { a => $localhost },
+    calendar                 => { cname => "www.example.com." },
+    '_carddavs._tcp'         => { SRV   => { "calendar.example.com." => { port => 443 } } },
+}, {
+    # Another section. Anything in here overrides the previous sections
+    mail                     => { a => '127.0.0.2' },
+    '@'                      => { a => '127.0.0.3' }, # Doesn't stomp over @'s NS, SOA, MX, or TXT.
+};
+
+# Bind:
+master "master.conf", "/etc/bind/";
+# Tiny:
+master "data", "/etc/sv/tinydns/root/";
+# Route53:
+master
