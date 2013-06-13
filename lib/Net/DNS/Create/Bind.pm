@@ -60,7 +60,7 @@ sub domain {
                                           $rr eq 'txt' ? txt($val) :
                                           $rr eq 'rp' ? email($val->[0]).' '.$val->[1] :
                                           $rr eq 'soa' ? join(' ', full_host($val->{primary_ns}),
-                                                                   email $val->{rp_email}, '(', strftime('%g%m%d%H%M', localtime),
+                                                                   email $val->{rp_email}, '(', $val->{serial} || strftime('%g%m%d%H%M', localtime),
                                                                                                 (map { interval $_ } $val->{refresh}, $val->{retry}, $val->{expire}, $val->{min_ttl}),
                                                                                            ')') :
                                           $val);
