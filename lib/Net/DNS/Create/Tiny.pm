@@ -1,11 +1,11 @@
 #  Copyright (c) 2009 David Caldwell,  All Rights Reserved. -*- cperl -*-
 
-package domain::tiny;
+package Net::DNS::Create::Tiny;
 use feature ':5.10';
 use strict;
 use warnings;
 
-use domain qw(internal full_host email interval);
+use Net::DNS::Create qw(internal full_host email interval);
 use File::Slurp qw(write_file);
 
 our %config = (default_ttl=>'1h');

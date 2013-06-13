@@ -1,7 +1,7 @@
 #  Copyright (c) 2009 David Caldwell,  All Rights Reserved. -*- cperl -*-
 
-package domain::bind;
-use domain qw(internal full_host email interval);
+package Net::DNS::Create::Bind;
+use Net::DNS::Create qw(internal full_host email interval);
 use feature ':5.10';
 use strict;
 use warnings;

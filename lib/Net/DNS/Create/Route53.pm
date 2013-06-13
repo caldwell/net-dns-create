@@ -1,11 +1,11 @@
 #  Copyright (c) 2013 David Caldwell,  All Rights Reserved. -*- cperl -*-
 
-package domain::route53;
+package Net::DNS::Create::Route53;
 use feature ':5.10';
 use strict;
 use warnings;
 
-use domain qw(internal full_host email interval);
+use Net::DNS::Create qw(internal full_host email interval);
 use Net::Amazon::Route53;
 
 our %config = (default_ttl=>'1h');

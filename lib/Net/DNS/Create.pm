@@ -1,6 +1,6 @@
 #  Copyright (c) 2011 David Caldwell,  All Rights Reserved. -*- cperl -*-
 
-package domain;
+package Net::DNS::Create;
 use strict; use warnings;
 require Exporter;
 our @ISA = qw(Exporter);
