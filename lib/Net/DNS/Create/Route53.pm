@@ -44,8 +44,7 @@ sub domain($$) {
 
     my $ttl = interval($config{default_ttl});
 
-    push @domain, { zone => hosted_zone($fq_domain),
-                    name => $fq_domain,
+    push @domain, { name => $fq_domain,
                     entries => [
                                 map { my $node = $_;
                                       my $fqdn = full_host($_,$domain);
@@ -83,28 +82,29 @@ sub domain($$) {
 }
 
 my $counter = rand(1000);
-sub master {
-    my ($package, $filename, $prefix, @extra) = @_;
+sub master() {
+    my ($package) = @_;
     local $|=1;
 
     for my $domain (@domain) {
-        if (!$domain->{zone} && scalar @{$domain->{entries}}) {
+        my $zone = hosted_zone(full_host($domain->{name}));
+        if (!$zone && scalar @{$domain->{entries}}) {
             my $hostedzone = Net::Amazon::Route53::HostedZone->new(route53 => r53,
                                                                    name => $domain->{name},
                                                                    comment=>(getpwuid($<))[0].'/'.__PACKAGE__,
                                                                    callerreference=>__PACKAGE__."-".localtime."-".($counter++));
             print "New Zone: $domain->{name}...";
             $hostedzone->create();
-            $domain->{zone} = $hostedzone;
+            $zone = $hostedzone;
             print "Created\n";
         }
 
-        if ($domain->{zone}) {
-            my $current = [ grep { $_->type ne 'SOA' && ($_->type ne 'NS' || $_->name ne $domain->{name}) } @{$domain->{zone}->resource_record_sets} ];
+        if ($zone) {
+            my $current = [ grep { $_->type ne 'SOA' && ($_->type ne 'NS' || $_->name ne $domain->{name}) } @{$zone->resource_record_sets} ];
             my $new = [ map { Net::Amazon::Route53::ResourceRecordSet->new(%{$_},
                                                                            values => [$_->{value} // @{$_->{records}}],
                                                                            route53 => r53,
-                                                                           hostedzone => $domain->{zone}) } @{$domain->{entries}} ];
+                                                                           hostedzone => $zone) } @{$domain->{entries}} ];
             printf "%s: %d -> %d\n", $domain->{name}, scalar @$current, scalar @$new;
             my $change = scalar @$current > 0 ? r53->atomic_update($current,$new) :
                          scalar @$new     > 0 ? r53->batch_create($new)           :
@@ -112,7 +112,7 @@ sub master {
 
             unless (scalar @{$domain->{entries}}) {
                 print "Deleting $domain->{name}\n";
-                $domain->{zone}->delete;
+                $zone->delete;
             }
         }
     }
