@@ -82,3 +82,88 @@ sub master_list($$) {
 }
 
 1;
+__END__
+
+=head1 NAME
+
+Net::DNS::Create::Bind - Bind backend for Net::DNS::Create
+
+=head1 SYNOPSIS
+
+ use Net::DNS::Create qw(Bind), default_ttl => "1h", conf_prefix => "local_", dest_dir => "./bind";
+
+ domain "example.com", { %records };
+
+ master "master.conf", "/etc/bind/";
+
+=head1 DESCRIPTION
+
+You should never use B<Net::DNS::Create::Bind> directly. Instead pass "Bind" to
+B<< L<Net::DNS::Create> >> in the "use" line.
+
+=head1 OPTIONS
+
+The following options are specific to B<Net::DNS::Create::Bind>:
+
+=over 4
+
+=item C<conf_prefix>
+
+This controls how the file names for each zone file are created. If you have 2
+domains, "example.com" and "example.net", and the conf_prefix is "local_" then
+the zone files will be named "I<local_example.com.zone>" and
+"I<local_example.net.zone>".
+
+The default conf_prefix is C<''>.
+
+=item C<dest_dir>
+
+This controls where the master and zone files are put. It defaults to C<''>.
+
+=back
+
+=head1 MASTER PARAMETERS
+
+ master "filename", "prefix", @extra_lines;
+
+=over 4
+
+=item C<filename>
+
+The file name for the master file. The file will be placed in the directory
+specified by the C<dest_dir> option, described above.
+
+=item C<prefix>
+
+Bind requires absolute path names. This parameter controls the include path for
+the zone files inside the master file. You will probably want 'I</etc/bind>' or
+'I</etc/named>'.
+
+=item C<@extra_lines>
+
+This lets you add extra configuration lines to the master.conf file, if you need
+to for some reason.
+
+=back
+
+=head1 SEE ALSO
+
+L<The Bind Home Page|https://www.isc.org/downloads/bind/>
+
+L<Net::DNS::Create>
+
+L<The Net::DNS::Create Home Page|https://github.com/caldwell/net-dns-create>
+
+=head1 AUTHOR
+
+David Caldwell E<lt>david@porkrind.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 by David Caldwell
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

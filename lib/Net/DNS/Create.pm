@@ -138,3 +138,157 @@ sub list_domains() {
 
 
 1;
+__END__
+
+=head1 NAME
+
+Net::DNS::Create - Create DNS configurations from a nice Perl structure based DSL.
+
+=head1 SYNOPSIS
+
+ use Net::DNS::Create qw(Bind),    default_ttl => "1h",
+                                   conf_prefix => "local_",
+                                   dest_dir    => "./bind";
+ # or
+ use Net::DNS::Create qw(Tiny),    default_ttl => "1h";
+ # or
+ use Net::DNS::Create qw(Route53), default_ttl => "1h",
+                                   amazon_id   => "AKIxxxxxxx",
+                                   amazon_key  => "kjdhakjsfnothisisntrealals";
+
+
+ # Then, for each domain you have:
+ domain "example.com", { %records };      # The simplest way.
+ domain "example.net", { %records },      # Records in %more_records override
+                       { %more_records }; # the ones in %record
+
+ # Then,
+ master "master.conf", "/etc/bind/"; # Bind (which requires absolute paths)
+ # or
+ master "data";                      # Tiny
+ # or
+ master;                             # Route53
+
+
+ # The different records Types:
+ domain "example.com", {
+   'www' => { a => '127.0.0.1' },            # names are non-qualified
+
+   'www2' => { cname => 'www' },             # no trailing dot for local names
+   'www2' => { cname => '@' },               # @ is supported
+   'www3' => { cname => 'a.example.net.' },  # trailing-dot for external names
+
+   '@' => { soa => { primary_ns => 'ns1.example.com.',
+                     rp_email   => 'some-email@example.com',
+                     serial     => 1234, # Set this to zero for auto-serial
+                     refresh    => '8h',
+                     retry      => '2h',
+                     expire     => '4w',
+                     min_ttl    => '1h' } },
+
+   'a' => { ns => 'ns1.example.com.' },
+   'b' => { ns => ['ns1', 'ns2'] },           # use an array for multiple NSes
+
+   'c' => { mx => { 0  => 'mail',
+                    10 => 'smtp' } },
+
+   'd' => { txt => "v=spf1 mx -all" },
+   'e' => { txt => ["v=spf1 mx -all",         # use an array for multiple TXTs
+                    "another different text record" ] },
+
+   'server' => { rp => ['david@example.com', david.people] },
+ };
+
+ # Multiple record types for a name
+ domain "example.com", {
+    '@' => { soa => { ... },
+             ns  => ['ns1', 'ns2'],
+             mx  => { 0  => 'mail',
+                      10 => 'smtp' },
+             txt => "v=spf1 mx -all",
+             a   => '127.0.0.1' },
+ };
+
+ # Overriding specific records
+ my %standard = ('@' => { soa => { ... },
+                          ns  => ['ns1', 'ns2'],
+                          mx  => { 0  => 'mail',
+                                   10 => 'smtp' },
+                          txt => "v=spf1 mx -all",
+                          a   => '127.0.0.1' });
+
+ domain "example.com", { %standard }, {
+   '@' => { a => '127.0.0.2' },  # 'A' record overridden, others remain intact.
+ };
+
+=head1 DESCRIPTION
+
+B<Net::DNS::Create> lets you specify your DNS configuration in a Perl script so
+that all the duplication that normally occurs in DNS config files can be
+expressed with variables and functions. This ultimately results in a (hopefully)
+DRY (Don't Repeat Yourself) representation of your DNS config data, making it
+easier and less error prone to change.
+
+B<Net::DNS::Create> supports multiple backends which means you can change out
+your DNS server software with minimal effort.
+
+=head1 TIME INTERVALS
+
+The C<default_ttl> option and the SOA record's C<refresh> C<retry>, C<expire>,
+and C<min_ttl> parameters all take time intervals. They can be conveniently
+specified using units:
+
+ s -> seconds
+ m -> minutes
+ h -> hours
+ d -> days
+ w -> weeks
+
+This way you can say "I<1h>" instead of "I<3600>" and "I<2w>" instead of
+"I<1209600>".
+
+=head1 OPTIONS
+
+Options to the backends are specified in the use line. For instance:
+
+ use Net::DNS::Create qw(Bind), default_ttl => "1h", conf_prefix => "local_", dest_dir => "./bind";
+
+The following options are generic to all the backends:
+
+=over 4
+
+=item C<default_ttl>
+
+This lets you set the default TTL for the entries. Currently there is no way to
+set TTLs for individual records.
+
+The default value is "I<1h>".
+
+=back
+
+See a backend's documentation for the descriptions of the backend's specific
+options.
+
+=head1 SEE ALSO
+
+L<Net::DNS::Create::Bind>
+
+L<Net::DNS::Create::Tiny>
+
+L<Net::DNS::Create::Route53>
+
+L<The Net::DNS::Create Home Page|https://github.com/caldwell/net-dns-create>
+
+=head1 AUTHOR
+
+David Caldwell E<lt>david@porkrind.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 by David Caldwell
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

@@ -76,3 +76,59 @@ sub master_list($$) {
 }
 
 1;
+__END__
+
+=head1 NAME
+
+Net::DNS::Create::Bind - TinyDNS (djbdns) backend for Net::DNS::Create
+
+=head1 SYNOPSIS
+
+ use Net::DNS::Create qw(Tiny), default_ttl => "1h";
+
+ domain "example.com", { %records };
+
+ master "data";
+
+=head1 DESCRIPTION
+
+You should never use B<Net::DNS::Create::Tiny> directly. Instead pass "Tiny" to
+B<< L<Net::DNS::Create> >> in the "use" line.
+
+=head1 OPTIONS
+
+B<Net::DNS::Create::Tiny> has no specific options.
+
+=head1 MASTER PARAMETERS
+
+ master "filename";
+
+=over 4
+
+=item C<filename>
+
+The file name for the configuration data. Most likely, 'I<data>'.
+
+=back
+
+=head1 SEE ALSO
+
+L<The TinyDNS (djbdns) Home Page|http://cr.yp.to/djbdns.html>
+
+L<Net::DNS::Create>
+
+L<The Net::DNS::Create Home Page|https://github.com/caldwell/net-dns-create>
+
+=head1 AUTHOR
+
+David Caldwell E<lt>david@porkrind.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 by David Caldwell
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

@@ -135,3 +135,79 @@ sub master_list($$) {
 }
 
 1;
+__END__
+
+=head1 NAME
+
+Net::DNS::Create::Route53 - Amazon AWS Route53 backend for Net::DNS::Create
+
+=head1 SYNOPSIS
+
+ use Net::DNS::Create qw(Route53), default_ttl => "1h",
+                                   amazon_id => "AKIxxxxxxx",
+                                   amazon_key => "kjdhakjsfnothisisntrealals";
+
+ domain "example.com", { %records };
+
+ master;
+
+=head1 DESCRIPTION
+
+You should never use B<Net::DNS::Create::Route53> directly. Instead pass "Route53"
+to B<< L<Net::DNS::Create> >> in the "use" line.
+
+=head1 OPTIONS
+
+The following options are specific to B<Net::DNS::Create::Route53>:
+
+=over 4
+
+=item C<amazon_id>
+
+The Amazon AWS user ID that is authorized to access Route53.
+
+=item C<amazon_key>
+
+The Amazon AWS user key that is authorized to access Route53.
+
+=back
+
+=head1 THE MASTER FUNCTION
+
+There are no parameters to the C<master> function when using the Route53 back
+end:
+
+ master;
+
+Calling C<master> will sync the zones' records to Route53, deleting and adding
+zones and records as appropriate.
+
+B<Net::DNS::Create::Route53> will never delete zones that have not been
+referenced by calls to the C<domain> function. This means that if you want to
+delete a zone you need to explicitly list it as empty:
+
+ domain "example.com", undef;
+
+Once it has been deleted you may remove it from the source code.
+
+=head1 SEE ALSO
+
+L<The Route53 Home Page|https://aws.amazon.com/route53/>
+
+L<Net::DNS::Create>
+
+L<The Net::DNS::Create Home Page|https://github.com/caldwell/net-dns-create>
+
+=head1 AUTHOR
+
+David Caldwell E<lt>david@porkrind.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 by David Caldwell
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
