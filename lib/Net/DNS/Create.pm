@@ -8,6 +8,7 @@ our @EXPORT = qw(domain master soa);
 our @EXPORT_OK = qw(domain master full_host local_host email interval);
 
 my $kind;
+our %config = (default_ttl=>'1h');
 sub import {
     use Data::Dumper;
     my $package = shift;
@@ -22,6 +23,7 @@ sub import {
         $kind = __PACKAGE__ . "::" . $import_kind;
         eval "require $kind"; die "$@" if $@;
         $kind->import(@_);
+        %config = (%config, @_); # Keep around the config for ourselves so we get the default_ttl setting.
         @_ = ();
     }
     __PACKAGE__->export_to_level(1, $package, @_);
@@ -70,7 +72,7 @@ sub domain($@) {
     }
 
     my $fq_domain = full_host($domain);
-    my $ttl = interval("1h");
+    my $ttl = interval($config{default_ttl});
     $entries = [ map { my $node = $_;
                           my $fqdn = full_host($_,$domain);
                           map {

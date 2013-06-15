@@ -28,7 +28,8 @@ sub domain {
     my $conf = '$TTL  '.interval($config{default_ttl})."\n".
                join '', map { ;
                               my $rr = lc $_->type;
-                              my $prefix = sprintf "%-30s in %-5s", local_host($_->name, $domain), $rr;
+                              my $ttl = $_->ttl != interval($config{default_ttl}) ? $_->ttl : "";
+                              my $prefix = sprintf "%-30s %7s in %-5s", local_host($_->name, $domain), $ttl, $rr;
 
                               $rr eq 'mx'  ? "$prefix ".$_->preference." ".local_host($_->exchange, $domain)."\n" :
                               $rr eq 'ns'  ? "$prefix ".local_host($_->nsdname, $domain)."\n" :

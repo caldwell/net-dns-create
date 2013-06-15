@@ -8,7 +8,7 @@ use warnings;
 use Net::DNS::Create qw(internal full_host email interval);
 use Net::Amazon::Route53;
 
-our %config = (default_ttl=>'1h');
+our %config;
 sub import {
     my $package = shift;
     my %c = @_;
@@ -46,8 +46,6 @@ sub _domain() { @domain } # Hook for testing
 sub domain($$) {
     my ($package, $domain, $entries) = @_;
 
-    my $ttl = interval($config{default_ttl});
-
     my @entries = map { ;
                         my $rr = lc $_->type;
 
@@ -59,7 +57,7 @@ sub domain($$) {
                         +{
                           action => 'create',
                           name   => $_->name.'.',
-                          ttl    => $ttl,
+                          ttl    => $_->ttl,
                           type   => uc $rr,
                           $rr eq 'a'     ? (value => $_->address) :
                           $rr eq 'cname' ? (value => $_->cname.'.') :
@@ -76,7 +74,7 @@ sub domain($$) {
                          +{
                            action => 'create',
                            name   => $set[0]->name.'.',
-                           ttl    => $ttl,
+                           ttl    => $set[0]->ttl,
                            type   => uc $rr,
                            $rr eq 'mx'    ? (records => [map { $_->preference." ".$_->exchange.'.' } @set]) :
                            $rr eq 'ns'    ? (records => [map { $_->nsdname.'.' } @set] ) :
