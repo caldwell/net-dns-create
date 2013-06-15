@@ -2,6 +2,9 @@
 
 package Net::DNS::Create;
 use strict; use warnings;
+
+our $VERSION='0.9.0';
+
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(domain master soa);
