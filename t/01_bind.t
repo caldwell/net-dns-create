@@ -18,11 +18,11 @@ master "master.conf";
 
 my @test;
 open my $test, '<', './t/tmp/test_example.com.zone' or die "./t/tmp/test_example.com.zone: $!";
-push @test, $_ while (<$test>);
+push @test, s/\s+/ / && $_ while (<$test>);
 
 my @good;
 open my $good, '<', './t/good/test_example.com.zone' or die "./t/good/test_example.com.zone: $!";
-push @good, $_ while (<$good>);
+push @good, s/\s+/ / && $_ while (<$good>);
 
 use Test::Deep;
 cmp_deeply([sort @test], [sort @good], "bind output is good");
