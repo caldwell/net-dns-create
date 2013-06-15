@@ -42,6 +42,7 @@ sub group_by_type_and_name($$) {
 }
 
 my @domain;
+sub _domain() { @domain } # Hook for testing
 sub domain($$) {
     my ($package, $domain, $entries) = @_;
 
