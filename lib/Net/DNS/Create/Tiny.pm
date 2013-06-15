@@ -64,8 +64,7 @@ sub domain($$) {
 }
 
 sub master {
-    my ($package, $filename, $prefix, @extra) = @_;
-    $prefix //= '';
+    my ($package, $filename) = @_;
     write_file($filename, @domain);
 }
 
