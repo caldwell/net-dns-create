@@ -26,4 +26,3 @@ push @good, s/\s+/ / && $_ while (<$good>);
 
 use Test::Deep;
 cmp_deeply([sort @test], [sort @good], "bind output is good");
-#is_deeply([sort @test], [sort @good]);
