@@ -52,7 +52,7 @@ sub domain($$) {
                         my $rr = lc $_->type;
 
                         $rr eq 'soa' ? () : # Amazon manages its own SOA stuff. Just ignore things we might have.
-                        $rr eq 'rp'  ? (warn("Amazon doesn't support RP records (or I don't know how to make them)") && ()) :
+                        $rr eq 'rp'  ? (warn("Amazon doesn't support RP records :-(") && ()) :
 
                         $rr eq 'mx' || $rr eq 'ns' || $rr eq 'srv' || $rr eq 'txt' ? () : # Handled specially, below
 
