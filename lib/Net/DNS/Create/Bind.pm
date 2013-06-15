@@ -1,7 +1,7 @@
 #  Copyright (c) 2009 David Caldwell,  All Rights Reserved. -*- cperl -*-
 
 package Net::DNS::Create::Bind;
-use Net::DNS::Create qw(internal full_host email interval);
+use Net::DNS::Create qw(internal full_host local_host email interval);
 use feature ':5.10';
 use strict;
 use warnings;
@@ -16,12 +16,9 @@ sub import {
     $config{$_} = $c{$_} for keys %c;
 }
 
-sub txt($) {
-    my ($t) = @_;
-    return "\"$t\"" if length $t < 255;
-    my @part;
-    push @part, $1 while ($t =~ s/^(.{255})//);
-    '('.join("\n" . " " x 41, map { "\"$_\"" } @part, $t).')';
+sub txt(@) {
+    return "\"$_[0]\"" if scalar @_ == 1;
+    '('.join("\n" . " " x 41, map { "\"$_\"" } @_).')';
 }
 
 our @zone;
@@ -29,46 +26,31 @@ sub domain {
     my ($package, $domain, $entries) = @_;
 
     my $conf = '$TTL  '.interval($config{default_ttl})."\n".
-               join '', map { my $node = $_;
-                              map {
-                                  my $rr = lc $_;
-                                  my $val = $entries->{$node}->{$_};
-                                  my $prefix = sprintf "%-30s in %-5s", $node, $rr;
+               join '', map { ;
+                              my $rr = lc $_->type;
+                              my $prefix = sprintf "%-30s in %-5s", local_host($_->name, $domain), $rr;
 
-                                  $rr eq 'mx' ? map {
-                                                       "$prefix $_ $val->{$_}\n";
-                                                    } keys %$val :
-
-                                  $rr eq 'ns' ? map {
-                                                       "$prefix $_\n"
-                                                    } @$val :
-
-                                  $rr eq 'txt' && ref $val eq 'ARRAY' ? map {
-                                                       "$prefix ".txt($_)."\n"
-                                                    } @$val :
-
-                                  $rr eq 'srv'   ? map {
-                                                         my $target = $_;
-                                                         map {
-                                                               "$prefix ".($_->{priority} // "0")
-                                                                     ." ".($_->{weight} // "0")
-                                                                     ." ".($_->{port})
-                                                                     ." ".$target."\n"
-                                                             } (ref $val->{$_} eq 'ARRAY' ? @{$val->{$_}} : $val->{$_})
-                                                       } keys %$val :
-                                  sprintf("%s %s\n", $prefix,
-                                          $rr eq 'txt' ? txt($val) :
-                                          $rr eq 'rp' ? email($val->[0]).' '.$val->[1] :
-                                          $rr eq 'soa' ? join(' ', full_host($val->{primary_ns}),
-                                                                   email $val->{rp_email}, '(', $val->{serial} || strftime('%g%m%d%H%M', localtime),
-                                                                                                (map { interval $_ } $val->{refresh}, $val->{retry}, $val->{expire}, $val->{min_ttl}),
-                                                                                           ')') :
-                                          $val);
-
-                              } keys %{$entries->{$node}}
-    } keys %$entries;
+                              $rr eq 'mx'  ? "$prefix ".$_->preference." ".local_host($_->exchange, $domain)."\n" :
+                              $rr eq 'ns'  ? "$prefix ".local_host($_->nsdname, $domain)."\n" :
+                              $rr eq 'txt' ? "$prefix ".txt($_->char_str_list)."\n" :
+                              $rr eq 'srv' ? "$prefix ".join(' ', $_->priority, $_->weight, $_->port, local_host($_->target, $domain))."\n" :
+                              $rr eq 'rp'  ? "$prefix ".local_host(email($_->mbox), $domain)." ".local_host($_->txtdname, $domain)."\n" :
+                              $rr eq 'soa' ? "$prefix ".join(' ', local_host($_->mname, $domain),
+                                                                  local_host(email($_->rname), $domain),
+                                                             '(',
+                                                                  $_->serial || strftime('%g%m%d%H%M', localtime),
+                                                                  $_->refresh,
+                                                                  $_->retry,
+                                                                  $_->expire,
+                                                                  $_->minimum,
+                                                             ')')."\n" :
+                              $rr eq 'a'     ? "$prefix ".$_->address."\n" :
+                              $rr eq 'cname' ? "$prefix ".local_host($_->cname, $domain)."\n" :
+                                  die __PACKAGE__." doesn't handle $rr record types";
+                          } @$entries;
 
     my $conf_name = "$config{dest_dir}/$config{conf_prefix}$domain.zone";
+    $conf_name =~ s/\.\././g;
     push @zone, { conf => $conf_name, domain => $domain };
     write_file($conf_name, $conf);
 }

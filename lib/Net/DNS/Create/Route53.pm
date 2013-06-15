@@ -28,57 +28,65 @@ sub hosted_zone($) {
     (grep { $_->name eq $_[0] } @$zones)[0] // undef;
 }
 
-sub txt($) {
-    my ($t) = @_;
-    return "\"$t\"" if length $t < 255;
-    my @part;
-    push @part, $1 while ($t =~ s/^(.{255})//);
-    map { "\"$_\"" } @part, $t;
+sub txt(@) {
+    map { "\"$_\"" } @_;
+}
+
+sub group_by_type_and_name($$) {
+    my ($re, $entries) = @_;
+    my %set;
+    for my $r (grep { lc($_->type) =~ $re } @$entries) {
+        push @{$set{$r->type .'_'. $r->name}}, $r;
+    }
+    map { $set{$_} } keys %set;
 }
 
 my @domain;
 sub domain($$) {
     my ($package, $domain, $entries) = @_;
 
-    my $fq_domain = "$domain.";
-
     my $ttl = interval($config{default_ttl});
 
-    push @domain, { name => $fq_domain,
-                    entries => [
-                                map { my $node = $_;
-                                      my $fqdn = full_host($_,$domain);
-                                      $fqdn =~ s/^@\.//;
-                                      map {
-                                          my $rr = lc $_;
-                                          my $val = $entries->{$node}->{$_};
+    my @entries = map { ;
+                        my $rr = lc $_->type;
 
-                                          $rr eq 'soa' ? () : # Amazon manages its own SOA stuff. Just ignore things we might have.
-                                          $rr eq 'rp'  ? (warn("Amazon doesn't support RP records (or I don't know how to make them)") && ()) :
-                                          $rr eq 'ns' && $node eq '@' ? () : # Amazon manages its own NS stuff. Just ignore things we might have.
-                                          +{
-                                            action => 'create',
-                                            name   => $fqdn,
-                                            ttl    => $ttl,
-                                            type   => uc $rr,
-                                            $rr eq 'a'     ? (value => $val) :
-                                            $rr eq 'cname' ? (value => $val) :
-                                            $rr eq 'mx'    ? (records => [map { "$_ $val->{$_}" } keys %$val] ) :
-                                            $rr eq 'ns'    ? (records => [@$val] ) :
-                                            $rr eq 'txt'   ? (records => [txt($val)] ) :
-                                            $rr eq 'srv'   ? (records => [map { my $target = $_;
-                                                                                map {
-                                                                                     ($_->{priority} // "0")
-                                                                                     ." ".($_->{weight} // "0")
-                                                                                     ." ".($_->{port})
-                                                                                     ." ".$target
-                                                                                    } (ref $val->{$_} eq 'ARRAY' ? @{$val->{$_}} : $val->{$_})
-                                                                              } keys %$val] ) :
-                                            (err => die "Don't know how to handle \"$rr\" RRs yet.")
+                        $rr eq 'soa' ? () : # Amazon manages its own SOA stuff. Just ignore things we might have.
+                        $rr eq 'rp'  ? (warn("Amazon doesn't support RP records (or I don't know how to make them)") && ()) :
 
-                                           }
-                                      } keys %{$entries->{$node}}
-                                } keys %$entries] };
+                        $rr eq 'mx' || $rr eq 'ns' || $rr eq 'srv' || $rr eq 'txt' ? () : # Handled specially, below
+
+                        +{
+                          action => 'create',
+                          name   => $_->name.'.',
+                          ttl    => $ttl,
+                          type   => uc $rr,
+                          $rr eq 'a'     ? (value => $_->address) :
+                          $rr eq 'cname' ? (value => $_->cname.'.') :
+                          (err => warn "Don't know how to handle \"$rr\" RRs yet.")
+
+                         }
+                    } @$entries;
+
+    # Amazon wants all NS,MX,TXT and SRV entries for a particular name in one of their entries. We get them in as
+    # separate entries so first we have to group them together.
+    push @entries, map { my @set = @$_;
+                         my $rr = lc $set[0]->type;
+                         $rr eq 'ns' && $set[0]->name.'.' eq $domain ? () : # Amazon manages its own NS stuff. Just ignore things we might have.
+                         +{
+                           action => 'create',
+                           name   => $set[0]->name.'.',
+                           ttl    => $ttl,
+                           type   => uc $rr,
+                           $rr eq 'mx'    ? (records => [map { $_->preference." ".$_->exchange.'.' } @set]) :
+                           $rr eq 'ns'    ? (records => [map { $_->nsdname.'.' } @set] ) :
+                           $rr eq 'srv'   ? (records => [map { $_->priority ." ".$_->weight ." ".$_->port ." ".$_->target.'.' } @set]) :
+                           $rr eq 'txt'   ? (records => [map { join ' ', txt($_->char_str_list) } @set]) :
+                           (err => die uc($rr)." can't happen here!")
+                          }
+                       } group_by_type_and_name(qr/^(?:mx|ns|srv|txt)$/, $entries);
+
+    push @domain, { name => $domain,
+                    entries => \@entries };
 }
 
 my $counter = rand(1000);
