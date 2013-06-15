@@ -9,7 +9,7 @@ use warnings;
 use POSIX qw(strftime);
 use File::Slurp qw(write_file);
 
-our %config = (conf_prefix=>'', default_ttl=>'1h');
+our %config = (conf_prefix=>'', default_ttl=>'1h', dest_dir=>'.');
 sub import {
     my $package = shift;
     my %c = @_;
@@ -68,7 +68,7 @@ sub domain {
                               } keys %{$entries->{$node}}
     } keys %$entries;
 
-    my $conf_name = "$config{conf_prefix}$domain.zone";
+    my $conf_name = "$config{dest_dir}/$config{conf_prefix}$domain.zone";
     push @zone, { conf => $conf_name, domain => $domain };
     write_file($conf_name, $conf);
 }
@@ -76,7 +76,8 @@ sub domain {
 sub master {
     my ($package, $filename, $prefix, @extra) = @_;
     $prefix //= '';
-    write_file($config{conf_prefix}.$filename,
+    my $master_file_name = "$config{dest_dir}/$config{conf_prefix}$filename";
+    write_file($master_file_name,
                @extra,
                map { <<EOZ
 zone "$_->{domain}" {
@@ -86,7 +87,7 @@ zone "$_->{domain}" {
 
 EOZ
                } @zone);
-    system("named-checkconf", "-z", $config{conf_prefix}.$filename);
+    system("named-checkconf", "-z", $master_file_name);
 }
 
 sub domain_list($@) {
