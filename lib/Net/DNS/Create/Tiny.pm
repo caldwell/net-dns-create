@@ -17,7 +17,7 @@ sub import {
 
 sub tiny_escape($) {
     my ($f) = @_;
-    $f =~ s/(:|\\|[^[:print:]])/sprintf "\\%03o", ord($1)/eg;
+    $f =~ s/(:|\\|[^ -~])/sprintf "\\%03o", ord($1)/eg;
     $f
 }
 
