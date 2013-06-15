@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
 # Choose 1:
-use Net::DNS::Create qw(Bind), default_ttl => "1h", conf_prefix => "local_";
-use Net::DNS::Create qw(Tiny), default_ttl => "1h", conf_prefix => "local_";
-use Net::DNS::Create qw(Route53), default_ttl => "1h", amazon_id => "AKIxxxxxxx", amazon_key => "kjdhakjsfnothisisntrealals";
+use Net::DNS::Create qw(Bind), default_ttl => "1h", conf_prefix => "local_", dest_dir => "./bind";
+#use Net::DNS::Create qw(Tiny), default_ttl => "1h", conf_prefix => "local_";
+#use Net::DNS::Create qw(Route53), default_ttl => "1h", amazon_id => "AKIxxxxxxx", amazon_key => "kjdhakjsfnothisisntrealals";
 
 
 my $localhost = '127.0.0.1';
@@ -11,7 +11,7 @@ my $localhost = '127.0.0.1';
 domain 'example.com', {
     '@'                      => {     soa   => { primary_ns => 'ns1.example.com.',
                                                  rp_email   => 'some-email@example.com',
-                                                 serial     => 0,
+                                                 serial     => 1234,
                                                  refresh    => '8h',
                                                  retry      => '2h',
                                                  expire     => '4w',
@@ -20,12 +20,16 @@ domain 'example.com', {
                                       a     => $localhost,
                                       mx    => { 0  => 'mail',
                                                  10 => 'smtp' },
-                                      TXT   => "v=spf1 mx -all", },
+                                      TXT   => ["v=spf1 mx -all",
+                                                "another different text record"] },
     'www'                    => { a     => $localhost,
                                   RP    => ['david@example.com', 'david.people'] },
     'david.people'           => { TXT   => 'For a good time call: 555-1212' },
-    'smtp'                   => { a     => $localhost },
+    'www2'                   => { cname => "www" },
+    'www3'                   => { cname => "@" },
+    'external'               => { cname => "external.example.net." },
     'mail'                   => { a     => $localhost },
+    'smtp'                   => { a     => $localhost },
     'example._domainkey'     => { TXT   => "v=DKIM1; n=blah =20 Blah; g=*; k=rsa; p=THISISNOTAREALDOMAINKEYJUSTANEXAMPLENOREALLYBLAHBLAHBLAHDOMAINKEYDOMAINKEYDOMAINKE".
 				           "YTHISISNOTAREALDOMAINKEYJUSTANEXAMPLENOREALLYBLAHBLAHBLAHDOMAINKEYDOMAINKEYDOMAINKETHISISNOTAREALDOMAINKEYJUSTANEXAMPLENOR".
 					   "EALLYBLAHBLAHBLAHDOMAINKEYDOMAINKEYDOMAINKETHISISNOTAREALDOMAINKEYJUSTANEXAMPLENOREALLYBLAHBLAHBLAHDOMAINKEYDOMAINKEYDOMAI".
@@ -35,7 +39,9 @@ domain 'example.com', {
     'more.stuff'             => { a => $localhost },
     'even.more.stuff'        => { a => $localhost },
     'tons.of.stuff'          => { a => $localhost },
-    calendar                 => { cname => "www.example.com." },
+    'ns1'                    => { a => $localhost },
+    'ns2'                    => { a => $localhost },
+    calendar                 => { a => $localhost },
     '_carddavs._tcp'         => { SRV   => { "calendar.example.com." => { port => 443 } } },
 }, {
     # Another section. Anything in here overrides the previous sections
@@ -44,8 +50,13 @@ domain 'example.com', {
 };
 
 # Bind:
-master "master.conf", "/etc/bind/";
+master "master.conf";
+# Real bind requires absolute paths in their includes, so this will prefix
+# the include files with "/etc/bind" in master.conf:
+#master "master.conf", "/etc/bind/";
+
 # Tiny:
-master "data", "/etc/sv/tinydns/root/";
+#master "data";
+
 # Route53:
-master
+#master
