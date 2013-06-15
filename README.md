@@ -55,7 +55,7 @@ This module requires these other modules and libraries:
 Copyright And Licence
 ---------------------
 
-Copyright © 2013 by David Caldwell
+Copyright © 2009-2013 by David Caldwell
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.12.4 or,

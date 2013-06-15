@@ -1,4 +1,4 @@
-#  Copyright (c) 2009 David Caldwell,  All Rights Reserved. -*- cperl -*-
+#  Copyright (c) 2009-2013 David Caldwell,  All Rights Reserved.
 
 package Net::DNS::Create::Bind;
 use Net::DNS::Create qw(internal full_host local_host email interval);

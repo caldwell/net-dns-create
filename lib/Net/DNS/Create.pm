@@ -1,4 +1,4 @@
-#  Copyright (c) 2011 David Caldwell,  All Rights Reserved. -*- cperl -*-
+#  Copyright (c) 2011-2013 David Caldwell,  All Rights Reserved.
 
 package Net::DNS::Create;
 use strict; use warnings;
@@ -285,7 +285,7 @@ David Caldwell E<lt>david@porkrind.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013 by David Caldwell
+Copyright (C) 2009-2013 by David Caldwell
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.12.4 or,
