@@ -103,7 +103,7 @@ sub master() {
             print "New Zone: $domain->{name}...";
             $hostedzone->create();
             $zone = $hostedzone;
-            print "Created\n";
+            print "Created. Nameservers:\n".join('', map { "  $_\n" } @{$zone->nameservers});
         }
 
         if ($zone) {
@@ -127,7 +127,7 @@ sub master() {
 
 sub domain_list($@) {
     my $zone = hosted_zone(full_host($_[0]));
-    printf "%-30s %s\n", $zone ? $zone->id : '', $_[0];
+    printf "%-30s %-30s %s\n", $zone ? $zone->id : '', $_[0], !$zone ? '' : ' ['.join(" ",@{$zone->nameservers}).']';
 }
 
 sub master_list($$) {
