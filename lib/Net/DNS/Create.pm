@@ -196,6 +196,12 @@ Net::DNS::Create - Create DNS configurations from a nice Perl structure based DS
    'e' => { txt => ["v=spf1 mx -all",         # use an array for multiple TXTs
                     "another different text record" ] },
 
+   '_carddavs._tcp' => { srv => { "www"  => { port => 443 },
+                                              # priority & weight default to 0
+                                  "www2" => { port => 443,
+                                              priority => 2,
+                                              weight   => 3 }, } },
+
    'server' => { rp => ['david@example.com', david.people] },
  };
 
