@@ -24,6 +24,7 @@ my $builder = Module::Build->new(
         'Test::More' => 0,
     },
     requires => {
+        'perl'                 => '5.10.0', # I use // indiscriminately.
         'Hash::Merge::Simple'  => 0,
         'Net::DNS'             => '0.72',
         'Net::Amazon::Route53' => 0,
