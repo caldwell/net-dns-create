@@ -32,6 +32,12 @@ if (-d ".git") { # Are we in our development tree? If so, create MANIFEST.
     print $manifest "MANIFEST\n";
     open $dir, '-|', 'git', 'ls-files' or die "Couldn't run git: $!";
     while (<$dir>) { print $manifest $_ }
+
+    # Also, create a cpanfile so we can use carton for development
+    my $cf;
+    open $cf, '>', 'cpanfile' or die "Couldn't create cpanfile";
+    print $cf "requires '$_';\n"
+        for (map { keys %{$builder->prereq_data->{$_}} } keys %{$builder->prereq_data});
 }
 
 $builder->create_build_script();
