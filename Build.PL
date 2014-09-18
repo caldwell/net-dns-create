@@ -36,8 +36,10 @@ if (-d ".git") { # Are we in our development tree? If so, create MANIFEST.
     # Also, create a cpanfile so we can use carton for development
     my $cf;
     open $cf, '>', 'cpanfile' or die "Couldn't create cpanfile";
-    print $cf "requires '$_';\n"
-        for (map { keys %{$builder->prereq_data->{$_}} } keys %{$builder->prereq_data});
+    my %prereq = ( map { %$_ } values %{$builder->prereq_data} );
+    while (my ($dep,$ver) = each %prereq) {
+        print $cf "requires '$dep'".($ver ? ", '$ver'" : '').";\n"
+    }
 }
 
 $builder->create_build_script();
