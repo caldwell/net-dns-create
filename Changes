@@ -1,3 +1,9 @@
+Net::DNS::Create (0.11.0)
+
+  * Route53, Bind: Quote weird characters properly in TXT records.
+
+ -- David Caldwell <david@porkrind.org>  Thu, 18 Sep 2014 13:20:58 -0700
+
 Net::DNS::Create (0.10.0)
 
   * Route53: List the name servers that Amazon assigns when creating a zone.
