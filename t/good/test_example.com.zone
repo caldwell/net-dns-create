@@ -10,6 +10,7 @@ david.people                   in txt   "For a good time call: 555-1212"
 @                              in mx    0 mail
 @                              in mx    10 smtp
 @                              in txt   "v=spf1 mx -all"
+@                              in txt   "Weird characters: \"hello\"<script>$$)(*&^%$#@!~`[]{}|:;\"',./<>?\000\011\012"
 @                              in txt   "another different text record"
 @                              in a     127.0.0.3
 @                              in soa   ns1 some-email ( 1234 28800 7200 2419200 3600 )

@@ -16,9 +16,16 @@ sub import {
     $config{$_} = $c{$_} for keys %c;
 }
 
+sub quote_txt(@) {
+    local $_ = $_[0];
+    s/[^[:print:]]/sprintf("\\%03o",ord($&))/ge;
+    s/["]/\\"/g;
+    "\"$_\""
+}
+
 sub txt(@) {
-    return "\"$_[0]\"" if scalar @_ == 1;
-    '('.join("\n" . " " x 41, map { "\"$_\"" } @_).')';
+    return quote_txt(@_) if scalar @_ == 1;
+    '('.join("\n" . " " x 41, map { quote_txt($_) } @_).')';
 }
 
 our @zone;

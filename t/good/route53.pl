@@ -128,6 +128,7 @@ $good = [
                              'type' => 'TXT',
                              'name' => 'example.com.',
                              'records' => [
+                                            '"Weird characters: \"hello\"\074script\076\044\044)(*\046\136\045\044\043\100\041\176\140\133\135\173\175\174:;\"\'\054.\057\074\076\077\000\011\012"',
                                             '"another different text record"',
                                             '"v=spf1 mx -all"',
                                           ]

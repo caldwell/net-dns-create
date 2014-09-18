@@ -29,7 +29,8 @@ sub hosted_zone($) {
 }
 
 sub txt(@) {
-    map { "\"$_\"" } @_;
+    map { s/[^-a-zA-Z0-9._='():;* ]/$& eq '"' ? '\\"' : sprintf("\\%03o", ord($&))/ge;
+        "\"$_\"" } @_;
 }
 
 sub group_by_type_and_name($$) {
