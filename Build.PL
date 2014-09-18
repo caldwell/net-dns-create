@@ -3,14 +3,6 @@ use strict;
 use warnings FATAL => 'all';
 use Module::Build;
 
-if (-d ".git") { # Are we in our development tree? If so, create MANIFEST.
-    my ($dir, $manifest);
-    open $manifest, ">", "MANIFEST" or die "MANIFEST: $!";
-    print $manifest "MANIFEST\n";
-    open $dir, '-|', 'git', 'ls-files' or die "Couldn't run git: $!";
-    while (<$dir>) { print $manifest $_ }
-}
-
 my $builder = Module::Build->new(
     module_name         => 'Net::DNS::Create',
     license             => 'perl',
@@ -32,5 +24,14 @@ my $builder = Module::Build->new(
         'LWP::Protocol::https' => 0, # Should probably be required by Net::Amazon::Route53
     },
 );
+
+
+if (-d ".git") { # Are we in our development tree? If so, create MANIFEST.
+    my ($dir, $manifest);
+    open $manifest, ">", "MANIFEST" or die "MANIFEST: $!";
+    print $manifest "MANIFEST\n";
+    open $dir, '-|', 'git', 'ls-files' or die "Couldn't run git: $!";
+    while (<$dir>) { print $manifest $_ }
+}
 
 $builder->create_build_script();
