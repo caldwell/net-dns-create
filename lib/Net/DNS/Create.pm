@@ -65,6 +65,11 @@ sub txt($) {
     (@part, $t);
 }
 
+
+sub arrayize($) {
+    (ref $_[0] eq 'ARRAY' ? @{$_[0]} : $_[0])
+}
+
 use Hash::Merge::Simple qw(merge);
 use Net::DNS::RR;
 sub domain($@) {
@@ -100,9 +105,9 @@ sub domain($@) {
                                                                       minimum       => interval($val->{min_ttl})) :
                                                     die "can't happen") :
 
-                              $rr eq 'txt' ? map { Net::DNS::RR->new(%common, char_str_list => [txt($_)]) } sort {$a cmp $b} (ref $val eq 'ARRAY' ? @{$val} : $val) :
+                              $rr eq 'txt' ? map { Net::DNS::RR->new(%common, char_str_list => [txt($_)]) } sort {$a cmp $b} arrayize($val) :
                               $rr eq 'mx'  ? map { Net::DNS::RR->new(%common, preference => $_, exchange => full_host($val->{$_}, $fq_domain)) } sort(keys %$val) :
-                              $rr eq 'ns'  ? map { Net::DNS::RR->new(%common, nsdname => $_) } sort(@$val) :
+                              $rr eq 'ns'  ? map { Net::DNS::RR->new(%common, nsdname => $_) } sort(arrayize($val)) :
                               $rr eq 'srv' ? map {
                                                 my $target = $_;
                                                 map {

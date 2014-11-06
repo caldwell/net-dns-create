@@ -8,6 +8,7 @@
 'david.people.example.com.:For a good time call\072 555-1212:3600
 &example.com.::ns1.example.com.:3600
 &example.com.::ns2.example.com.:3600
+&subdomain.example.com.::subdomain-ns.example.com.:3600
 @example.com.::mail.example.com.:0::3600
 @example.com.::smtp.example.com.:10::3600
 'example.com.:Weird characters\072 "hello"<script>$$)(*&^%$#@!~`[]{}|\072;"',./<>?\000\011\012:3600

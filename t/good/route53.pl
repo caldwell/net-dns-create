@@ -72,6 +72,15 @@ $good = [
                              'name' => 'ns2.example.com.'
                            },
                            {
+                             'type' => 'NS',
+                             'name' => 'subdomain.example.com.',
+                             'action' => 'create',
+                             'ttl' => 3600,
+                             'records' => [
+                                            'subdomain-ns.example.com.'
+                                          ]
+                           },
+                           {
                              'value' => '127.0.0.1',
                              'ttl' => 3600,
                              'type' => 'A',

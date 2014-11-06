@@ -36,6 +36,7 @@ domain 'example.com', {
     'tons.of.stuff'          => { a => $localhost },
     'ns1'                    => { a => $localhost },
     'ns2'                    => { a => $localhost },
+    subdomain                => { ns => 'subdomain-ns.example.com.' },
     calendar                 => { a => $localhost },
     '_carddavs._tcp'         => { SRV   => { "calendar.example.com." => { port => 443 } } },
 }, {

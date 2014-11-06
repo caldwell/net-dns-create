@@ -27,3 +27,4 @@ stuff                          in a     127.0.0.1
 even.more.stuff                in a     127.0.0.1
 ns1                            in a     127.0.0.1
 www2                           in cname www
+subdomain                      in ns    subdomain-ns
