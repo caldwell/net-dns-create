@@ -39,3 +39,4 @@ cmp_deeply([@test], [@good], "route53 internal struct is good");
 
 # warn Dumper[$test[0]{entries}->[14]];
 # warn Dumper[$good[0]{entries}->[14]];
+# warn Dumper \@test; # The easiest way to update the output
