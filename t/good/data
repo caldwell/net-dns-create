@@ -12,7 +12,7 @@
 &subdomain.example.com.::subdomain-ns.example.com.:3600
 @example.com.::mail.example.com.:0::3600
 @example.com.::smtp.example.com.:10::3600
-'example.com.:Weird characters\072 "hello"<script>$$)(*&^%$#@!~`[]{}|\072;"',./<>?\000\011\012:3600
+'example.com.:Weird characters\072 "hello"<script>$$)(*&^%$#@!~`[]{}\134|\072;"',./<>?\000\011\012:3600
 'example.com.:another different text record:3600
 'example.com.:v=spf1 mx -all:3600
 =example.com.:127.0.0.3:3600

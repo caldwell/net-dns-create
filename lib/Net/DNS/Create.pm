@@ -57,11 +57,18 @@ sub interval($) {
     $_[0] =~ /(\d+)([hmsdw])/ && $1 * { s=>1, m=>60, h=>3600, d=>3600*24, w=>3600*24*7 }->{$2} || $_[0];
 }
 
+sub escape($) {
+    my $s = shift;
+    # Net::DNS::RR::TXT interpolates \xxx style octally encoded escapes. We don't want this so we escape the \s
+    $s =~ s/\\/\\\\/g;
+    $s;
+}
+
 sub txt($) {
     my ($t) = @_;
-    return "$t" if length $t < 255;
+    return escape($t) if length $t < 255;
     my @part;
-    push @part, $1 while ($t =~ s/^(.{255})//);
+    push @part, escape($1) while ($t =~ s/^(.{255})//);
     (@part, $t);
 }
 

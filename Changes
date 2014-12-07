@@ -2,6 +2,7 @@ Net::DNS::Create (1.0.0)
 
   * Add support for multiple As and RPs.
   * Handle singular NS records like we claim to in the docs.
+  * Fix backslashes being lost in TXT records.
 
  -- David Caldwell <david@porkrind.org>  Sun, 07 Dec 2014 12:56:48 -0800
 
