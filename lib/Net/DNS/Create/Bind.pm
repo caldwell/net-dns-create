@@ -18,7 +18,8 @@ sub import {
 
 sub quote_txt(@) {
     local $_ = $_[0];
-    s/[^[:print:]]/sprintf("\\%03o",ord($&))/ge;
+    # [[:cntrl:]] Appears redundant, but in perl 5.10 [[:print:]] includes \n (!)
+    s/[^[:print:]]|[[:cntrl:]]/sprintf("\\%03o",ord($&))/ge;
     s/["]/\\"/g;
     "\"$_\""
 }
