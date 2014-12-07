@@ -3,7 +3,7 @@
 package Net::DNS::Create;
 use strict; use warnings;
 
-our $VERSION='0.11.0';
+our $VERSION='1.0.0';
 
 require Exporter;
 our @ISA = qw(Exporter);
