@@ -15,26 +15,26 @@ $good = [
                              'name' => 'more.stuff.example.com.',
                              'action' => 'create',
                              'type' => 'A',
-                             'value' => '127.0.0.1',
+                             'records' => [ '127.0.0.1' ],
                              'ttl' => 3600
                            },
                            {
                              'name' => 'smtp.example.com.',
                              'action' => 'create',
-                             'value' => '127.0.0.1',
+                             'records' => [ '127.0.0.1' ],
                              'ttl' => 3600,
                              'type' => 'A'
                            },
                            {
                              'name' => 'mail.example.com.',
                              'ttl' => 3600,
-                             'value' => '127.0.0.2',
+                             'records' => [ '127.0.0.2' ],
                              'type' => 'A',
                              'action' => 'create'
                            },
                            {
                              'name' => 'www.example.com.',
-                             'value' => '127.0.0.1',
+                             'records' => [ '127.0.0.1' ],
                              'ttl' => 3600,
                              'type' => 'A',
                              'action' => 'create'
@@ -49,6 +49,15 @@ $good = [
                              'name' => 'example._domainkey.example.com.'
                            },
                            {
+                             'type' => 'TXT',
+                             'records' => [
+                                            '"For a *great* time call: 555-1213"'
+                                          ],
+                             'action' => 'create',
+                             'ttl' => 3600,
+                             'name' => 'bob.people.example.com.'
+                           },
+                           {
                              'name' => 'david.people.example.com.',
                              'records' => [
                                             '"For a good time call: 555-1212"'
@@ -59,7 +68,7 @@ $good = [
                            },
                            {
                              'name' => 'even.more.stuff.example.com.',
-                             'value' => '127.0.0.1',
+                             'records' => [ '127.0.0.1' ],
                              'type' => 'A',
                              'ttl' => 3600,
                              'action' => 'create'
@@ -67,7 +76,7 @@ $good = [
                            {
                              'action' => 'create',
                              'type' => 'A',
-                             'value' => '127.0.0.1',
+                             'records' => [ '127.0.0.1' ],
                              'ttl' => 3600,
                              'name' => 'ns2.example.com.'
                            },
@@ -81,7 +90,7 @@ $good = [
                                           ]
                            },
                            {
-                             'value' => '127.0.0.1',
+                             'records' => [ '127.0.0.1' ],
                              'ttl' => 3600,
                              'type' => 'A',
                              'action' => 'create',
@@ -105,7 +114,7 @@ $good = [
                            },
                            {
                              'type' => 'A',
-                             'value' => '127.0.0.1',
+                             'records' => [ '127.0.0.1' ],
                              'ttl' => 3600,
                              'action' => 'create',
                              'name' => 'ns1.example.com.'
@@ -118,7 +127,7 @@ $good = [
                              'name' => 'www2.example.com.'
                            },
                            {
-                             'value' => '127.0.0.1',
+                             'records' => [ '127.0.0.1' ],
                              'ttl' => 3600,
                              'type' => 'A',
                              'action' => 'create',
@@ -156,16 +165,26 @@ $good = [
                              'name' => 'example.com.',
                              'action' => 'create',
                              'ttl' => 3600,
-                             'value' => '127.0.0.3',
+                             'records' => [ '127.0.0.3' ],
                              'type' => 'A'
                            },
                            {
                              'name' => 'tons.of.stuff.example.com.',
                              'action' => 'create',
                              'ttl' => 3600,
-                             'value' => '127.0.0.1',
+                             'records' => [ '127.0.0.1' ],
                              'type' => 'A'
-                           }
+                           },
+                           {
+                             'records' => [
+                                            '127.0.0.4',
+                                            '127.0.0.5'
+                                          ],
+                             'action' => 'create',
+                             'type' => 'A',
+                             'ttl' => 3600,
+                             'name' => 'round-robin.example.com.'
+                           },
                          ]
           }
         ];

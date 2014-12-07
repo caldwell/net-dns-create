@@ -53,14 +53,13 @@ sub domain($$) {
                         $rr eq 'soa' ? () : # Amazon manages its own SOA stuff. Just ignore things we might have.
                         $rr eq 'rp'  ? (warn("Amazon doesn't support RP records :-(") && ()) :
 
-                        $rr eq 'mx' || $rr eq 'ns' || $rr eq 'srv' || $rr eq 'txt' ? () : # Handled specially, below
+                        $rr eq 'a' || $rr eq 'mx' || $rr eq 'ns' || $rr eq 'srv' || $rr eq 'txt' ? () : # Handled specially, below
 
                         +{
                           action => 'create',
                           name   => $_->name.'.',
                           ttl    => $_->ttl,
                           type   => uc $rr,
-                          $rr eq 'a'     ? (value => $_->address) :
                           $rr eq 'cname' ? (value => $_->cname.'.') :
                           (err => warn "Don't know how to handle \"$rr\" RRs yet.")
 
@@ -77,13 +76,14 @@ sub domain($$) {
                            name   => $set[0]->name.'.',
                            ttl    => $set[0]->ttl,
                            type   => uc $rr,
+                           $rr eq 'a'     ? (records => [map { $_->address } @set]) :
                            $rr eq 'mx'    ? (records => [map { $_->preference." ".$_->exchange.'.' } @set]) :
                            $rr eq 'ns'    ? (records => [map { $_->nsdname.'.' } @set] ) :
                            $rr eq 'srv'   ? (records => [map { $_->priority ." ".$_->weight ." ".$_->port ." ".$_->target.'.' } @set]) :
                            $rr eq 'txt'   ? (records => [map { join ' ', txt($_->char_str_list) } @set]) :
                            (err => die uc($rr)." can't happen here!")
                           }
-                       } group_by_type_and_name(qr/^(?:mx|ns|srv|txt)$/, $entries);
+                       } group_by_type_and_name(qr/^(?:mx|ns|srv|txt|a)$/, $entries);
 
     push @domain, { name => $domain,
                     entries => \@entries };

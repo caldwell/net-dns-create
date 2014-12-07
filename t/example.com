@@ -20,6 +20,7 @@ domain 'example.com', {
     'www'                    => { a     => $localhost,
                                   RP    => ['david@example.com', 'david.people'] },
     'david.people'           => { TXT   => 'For a good time call: 555-1212' },
+    'bob.people'             => { TXT   => 'For a *great* time call: 555-1213' },
     'www2'                   => { cname => "www" },
     'www3'                   => { cname => "@" },
     'external'               => { cname => "external.example.net." },
@@ -37,6 +38,9 @@ domain 'example.com', {
     'ns1'                    => { a => $localhost },
     'ns2'                    => { a => $localhost },
     subdomain                => { ns => 'subdomain-ns.example.com.' },
+    'round-robin'            => { a => [ '127.0.0.4', '127.0.0.5' ],
+                                  rp => [ ['david@example.com', 'david.people'],
+                                          [  'bob@example.com',   'bob.people'] ] },
     calendar                 => { a => $localhost },
     '_carddavs._tcp'         => { SRV   => { "calendar.example.com." => { port => 443 } } },
 }, {
